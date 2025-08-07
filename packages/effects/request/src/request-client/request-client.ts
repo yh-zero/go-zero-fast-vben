@@ -133,6 +133,8 @@ class RequestClient {
     config: RequestClientConfig,
   ): Promise<T> {
     try {
+      console.log('request url', url);
+      console.log('request config', config);
       const response: AxiosResponse<T> = await this.instance({
         url,
         ...config,
@@ -140,8 +142,10 @@ class RequestClient {
           ? { paramsSerializer: getParamsSerializer(config.paramsSerializer) }
           : {}),
       });
+      console.log('request response', response);
       return response as T;
     } catch (error: any) {
+      console.error('request failed', error);
       throw error.response ? error.response.data : error;
     }
   }

@@ -5,11 +5,16 @@ export namespace AuthApi {
   export interface LoginParams {
     password?: string;
     username?: string;
+    captchaId?: string;
+    captcha?: string;
   }
 
   /** 登录接口返回值 */
   export interface LoginResult {
     accessToken: string;
+    token: string;
+    expire?: string;
+    userId?: number;
   }
 
   export interface RefreshTokenResult {
@@ -22,6 +27,7 @@ export namespace AuthApi {
  * 登录
  */
 export async function loginApi(data: AuthApi.LoginParams) {
+  console.log('loginApi data', data);
   return requestClient.post<AuthApi.LoginResult>('/v1/sys/user/login', data);
 }
 

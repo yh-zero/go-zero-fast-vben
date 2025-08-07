@@ -8,8 +8,8 @@ import axios from 'axios';
 
 export const defaultResponseInterceptor = ({
   codeField = 'code',
-  dataField = 'data',
-  successCode = 0,
+  dataField = 'result',
+  successCode = 200,
 }: {
   /** 响应数据中代表访问结果的字段名 */
   codeField: string;

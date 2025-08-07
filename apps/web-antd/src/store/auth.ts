@@ -29,81 +29,106 @@ export const useAuthStore = defineStore('auth', () => {
     params: Recordable<any>,
     onSuccess?: () => Promise<void> | void,
   ) {
-    // 异步处理用户登录操作并获取 accessToken
     let userInfo: null | UserInfo = null;
+    console.log('authLogin userInfo', userInfo);
+
     try {
       loginLoading.value = true;
-      const { accessToken } = await loginApi(params);
+      const loginApiRes_ = await loginApi(params);
+      console.log('authLogin loginApiRes_', loginApiRes_);
+      const accessToken = loginApiRes_.token;
 
-      // 如果成功获取到 accessToken
-      if (accessToken) {
-        accessStore.setAccessToken(accessToken);
+      if (!accessToken) {
+        throw new Error('Failed to get access token');
+      }
 
-        // 获取用户信息并存储到 accessStore 中
-        const [fetchUserInfoResult, accessCodes] = await Promise.all([
+      accessStore.setAccessToken(accessToken);
+
+      // 单独捕获 fetchUserInfo 和 getAccessCodesApi 的错误
+      let accessCodes, fetchUserInfoResult;
+      try {
+        [fetchUserInfoResult, accessCodes] = await Promise.all([
           fetchUserInfo(),
           getAccessCodesApi(),
         ]);
+      } catch (error) {
+        console.error('Failed to fetch user info or access codes:', error);
+        throw error; // 重新抛出，让外层 catch 处理
+      }
 
-        userInfo = fetchUserInfoResult;
+      userInfo = fetchUserInfoResult;
+      userStore.setUserInfo(userInfo);
+      accessStore.setAccessCodes(accessCodes);
 
-        userStore.setUserInfo(userInfo);
-        accessStore.setAccessCodes(accessCodes);
-
-        if (accessStore.loginExpired) {
-          accessStore.setLoginExpired(false);
+      if (accessStore.loginExpired) {
+        accessStore.setLoginExpired(false);
+      } else {
+        if (onSuccess) {
+          try {
+            await onSuccess();
+          } catch (error) {
+            console.error('onSuccess callback failed:', error);
+          }
         } else {
-          onSuccess
-            ? await onSuccess?.()
-            : await router.push(
-                userInfo.homePath || preferences.app.defaultHomePath,
-              );
-        }
-
-        if (userInfo?.realName) {
-          notification.success({
-            description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
-            duration: 3,
-            message: $t('authentication.loginSuccess'),
-          });
+          await router.push(
+            userInfo.homePath || preferences.app.defaultHomePath,
+          );
         }
       }
+
+      if (userInfo?.realName) {
+        notification.success({
+          description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
+          duration: 3,
+          message: $t('authentication.loginSuccess'),
+        });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      notification.error({
+        message: $t('authentication.loginFailed'),
+        description: error.message || $t('authentication.loginFailedDesc'),
+      });
+      throw error; // 允许调用方进一步处理
     } finally {
       loginLoading.value = false;
     }
 
-    return {
-      userInfo,
-    };
+    return { userInfo };
   }
-
   async function logout(redirect: boolean = true) {
     try {
       await logoutApi();
-    } catch {
-      // 不做任何处理
+    } catch (error) {
+      console.error('Logout API failed:', error);
     }
+
     resetAllStores();
     accessStore.setLoginExpired(false);
 
-    // 回登录页带上当前路由地址
-    await router.replace({
-      path: LOGIN_PATH,
-      query: redirect
-        ? {
-            redirect: encodeURIComponent(router.currentRoute.value.fullPath),
-          }
-        : {},
-    });
+    try {
+      // 回登录页带上当前路由地址
+      await router.replace({
+        path: LOGIN_PATH,
+        query: redirect
+          ? { redirect: encodeURIComponent(router.currentRoute.value.fullPath) }
+          : {},
+      });
+    } catch (error) {
+      console.error('Route redirect failed:', error);
+    }
   }
 
   async function fetchUserInfo() {
-    let userInfo: null | UserInfo = null;
-    userInfo = await getUserInfoApi();
-    userStore.setUserInfo(userInfo);
-    return userInfo;
+    try {
+      const userInfo = await getUserInfoApi();
+      userStore.setUserInfo(userInfo);
+      return userInfo;
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      throw error; // 让调用方处理
+    }
   }
-
   function $reset() {
     loginLoading.value = false;
   }

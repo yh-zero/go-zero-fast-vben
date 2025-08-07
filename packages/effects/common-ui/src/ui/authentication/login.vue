@@ -67,6 +67,9 @@ const rememberMe = ref(!!localUsername);
 async function handleSubmit() {
   const { valid } = await formApi.validate();
   const values = await formApi.getValues();
+  console.log('values', values);
+  values.captchaId = 'test-1';
+  values.captcha = 'test-2';
   if (valid) {
     localStorage.setItem(
       REMEMBER_ME_KEY,
