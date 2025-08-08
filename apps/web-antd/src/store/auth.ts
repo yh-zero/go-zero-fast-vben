@@ -87,7 +87,8 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('Login failed:', error);
       notification.error({
         message: $t('authentication.loginFailed'),
-        description: error.message || $t('authentication.loginFailedDesc'),
+        // description: error?.message || $t('authentication.loginFailedDesc'),
+        description: $t('authentication.loginFailed'),
       });
       throw error; // 允许调用方进一步处理
     } finally {
@@ -132,6 +133,7 @@ export const useAuthStore = defineStore('auth', () => {
   function $reset() {
     loginLoading.value = false;
   }
+  const elementPermissionList = ref<string[]>([]);
 
   return {
     $reset,
@@ -139,5 +141,6 @@ export const useAuthStore = defineStore('auth', () => {
     fetchUserInfo,
     loginLoading,
     logout,
+    elementPermissionList,
   };
 });

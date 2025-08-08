@@ -22,7 +22,9 @@ async function generateAccessible(
   mode: AccessModeType,
   options: GenerateMenuAndRoutesOptions,
 ) {
-  console.log('generateAccessible', mode, options);
+  console.log('generateAccessible mode', mode);
+  mode = 'backend';
+  console.log('generateAccessible mode', mode);
 
   const { router } = options;
 
@@ -85,6 +87,8 @@ async function generateRoutes(
   const { forbiddenComponent, roles, routes } = options;
 
   let resultRoutes: RouteRecordRaw[] = routes;
+  console.log('generateRoutes mode', mode);
+
   switch (mode) {
     case 'backend': {
       resultRoutes = await generateRoutesByBackend(options);

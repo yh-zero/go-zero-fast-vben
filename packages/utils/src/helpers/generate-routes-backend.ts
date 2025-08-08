@@ -42,6 +42,7 @@ function convertRoutes(
   layoutMap: ComponentRecordType,
   pageMap: ComponentRecordType,
 ): RouteRecordRaw[] {
+  console.log('mapTree2222222222');
   return mapTree(routes, (node) => {
     const route = node as unknown as RouteRecordRaw;
     const { component, name } = node;

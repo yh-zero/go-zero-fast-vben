@@ -26,6 +26,7 @@
     "#/*": "./src/*"
   },
   "dependencies": {
+    "@axolo/tree-array": "^0.6.0",
     "@vben/access": "workspace:*",
     "@vben/common-ui": "workspace:*",
     "@vben/constants": "workspace:*",
