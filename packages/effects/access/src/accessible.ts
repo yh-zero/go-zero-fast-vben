@@ -22,6 +22,8 @@ async function generateAccessible(
   mode: AccessModeType,
   options: GenerateMenuAndRoutesOptions,
 ) {
+  console.log('generateAccessible', mode, options);
+
   const { router } = options;
 
   options.routes = cloneDeep(options.routes);
