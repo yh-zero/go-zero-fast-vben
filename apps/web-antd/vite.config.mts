@@ -11,7 +11,8 @@ export default defineConfig(async () => {
             rewrite: (path) => path.replace(/^\/api/, ''),
             // mock代理目标地址
             // target: 'http://localhost:5320/api',
-            target: 'http://localhost:6100/', // 7100 为 go-zero-fast 服务端口
+            // target: 'http://localhost:6100/', // 7100 为 go-zero-fast 服务端口
+            target: 'http://192.168.10.197:6100/', // 7100 为 go-zero-fast 服务端口
             ws: true,
           },
         },
