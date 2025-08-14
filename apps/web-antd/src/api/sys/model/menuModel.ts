@@ -1,5 +1,5 @@
 import type { RouteRecordStringComponent } from '@vben/typings';
-import type { BaseListResp } from '../../model/baseModel';
+import type { BaseListResponse } from '../../model/baseModel';
 import type { RouteMeta } from 'vue-router';
 
 export interface RouteItem {
@@ -19,4 +19,4 @@ export interface RouteItem {
 /**
  * @description: Get menu return value
  */
-export type RoleMenuResp = BaseListResp<RouteRecordStringComponent>;
+export type RoleMenuResp = BaseListResponse<RouteRecordStringComponent>;

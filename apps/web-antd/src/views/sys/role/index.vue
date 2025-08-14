@@ -1,17 +1,11 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { RoleInfo } from '#/api/sys/model/roleModel';
+
+import { getRoleList } from '#/api/sys/role';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
-
-interface RowType {
-  category: string;
-  color: string;
-  id: string;
-  price: string;
-  productName: string;
-  releaseDate: string;
-}
 
 const formOptions: VbenFormProps = {
   // 默认展开
@@ -20,96 +14,68 @@ const formOptions: VbenFormProps = {
     {
       component: 'Input',
       componentProps: {
-        placeholder: 'Please enter category',
+        placeholder: '请输入 角色名称',
       },
-      defaultValue: '1',
-      fieldName: 'category',
-      label: 'Category',
-    },
-    {
-      component: 'Input',
-      componentProps: {
-        placeholder: 'Please enter productName',
-      },
-      fieldName: 'productName',
-      label: 'ProductName',
-    },
-    {
-      component: 'Input',
-      componentProps: {
-        placeholder: 'Please enter price',
-      },
-      fieldName: 'price',
-      label: 'Price',
-    },
-    {
-      component: 'Select',
-      componentProps: {
-        allowClear: true,
-        options: [
-          {
-            label: 'Color1',
-            value: '1',
-          },
-          {
-            label: 'Color2',
-            value: '2',
-          },
-        ],
-        placeholder: '请选择',
-      },
-      fieldName: 'color',
-      label: 'Color',
-    },
-    {
-      component: 'DatePicker',
-      fieldName: 'datePicker',
-      label: 'Date',
+      fieldName: 'name',
+      label: '角色名称',
     },
   ],
   // 控制表单是否显示折叠按钮
-  showCollapseButton: true,
+  showCollapseButton: false,
   submitButtonOptions: {
     content: '查询',
   },
   // 是否在字段值改变时提交表单
   submitOnChange: false,
   // 按下回车时是否提交表单
-  submitOnEnter: false,
+  submitOnEnter: true,
 };
 
-const gridOptions: VxeGridProps<RowType> = {
+const gridOptions: VxeGridProps<RoleInfo> = {
   checkboxConfig: {
     highlight: true,
-    labelField: 'name',
   },
   columns: [
-    { title: '序号', type: 'seq', width: 50 },
-    { align: 'left', title: 'Name', type: 'checkbox', width: 100 },
-    { field: 'category', title: 'Category' },
-    { field: 'color', title: 'Color' },
-    { field: 'productName', title: 'Product Name' },
-    { field: 'price', title: 'Price' },
-    { field: 'releaseDate', formatter: 'formatDateTime', title: 'Date' },
-  ],
-  keepSource: true,
-  pagerConfig: {},
-  proxyConfig: {
-    ajax: {
-      // query: async ({ page }, formValues) => {
-      //   message.success(`Query params: ${JSON.stringify(formValues)}`);
-      //   return await getExampleTableApi({
-      //     page: page.currentPage,
-      //     pageSize: page.pageSize,
-      //     ...formValues,
-      //   });
-      // },
+    { type: 'checkbox', width: 60 },
+    { field: 'name', title: '角色名称' },
+    {
+      field: 'status',
+      title: '状态',
+      width: 80,
+      formatter: ({ cellValue }) => {
+        return cellValue === 1 ? '启用' : '禁用';
+      },
     },
-  },
+    { field: 'defaultRouter', title: '默认登录页面' },
+    { field: 'remark', title: '备注' },
+    { field: 'createdAt', title: '创建时间', formatter: 'formatDateTime' },
+    { field: 'updatedAt', title: '更新时间', formatter: 'formatDateTime' },
+  ],
   toolbarConfig: {
     // 是否显示搜索表单控制按钮
     // @ts-ignore 正式环境时有完整的类型声明
     search: true,
+  },
+  height: 'auto',
+  keepSource: true,
+  pagerConfig: {
+    currentPage: 1, // 默认当前页码
+    pageSize: 10, // 默认每页条数
+    pageSizes: [2, 10, 20, 50, 100], // 可选择的每页条数
+    // layout: 'Total, sizes, prev, pager, next, jumper', // 分页器布局
+    total: 0, // 总条数（通常由数据加载后设置）
+  },
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }, formValues) => {
+        const res = await getRoleList({
+          pageNo: page.currentPage,
+          pageSize: page.pageSize,
+          ...formValues,
+        });
+        return res;
+      },
+    },
   },
 };
 
@@ -118,9 +84,6 @@ const [Grid] = useVbenVxeGrid({ formOptions, gridOptions });
 
 <template>
   <Page autoContentHeight>
-    <div class="vp-raw w-full">
-      <div>1111</div>
-      <Grid />
-    </div>
+    <Grid />
   </Page>
 </template>
