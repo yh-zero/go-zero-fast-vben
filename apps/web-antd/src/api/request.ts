@@ -103,6 +103,20 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     }),
   );
 
+  // 添加成功提示响应拦截器
+  client.addResponseInterceptor({
+    fulfilled: (response) => {
+      // 直接从response对象中获取message
+      if ((response as any)?.message) {
+        message.success((response as any).message);
+      }
+      return response;
+    },
+    rejected: (error) => {
+      return Promise.reject(error);
+    },
+  });
+
   return client;
 }
 

@@ -8,6 +8,10 @@ export interface BaseListResponse<T> {
   total?: number;
   cursor?: number;
 }
+export interface BaseResponse {
+  code?: number;
+  message: string;
+}
 
 // export interface BaseDataResp<T> {
 //   data: T[];

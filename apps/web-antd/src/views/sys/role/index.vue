@@ -3,9 +3,11 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { RoleInfo } from '#/api/sys/model/roleModel';
 
-import { getRoleList } from '#/api/sys/role';
+import { getRoleList, updateRole } from '#/api/sys/role';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { Page } from '@vben/common-ui';
+import { Switch } from 'ant-design-vue';
+import { h } from 'vue';
 
 const formOptions: VbenFormProps = {
   // 默认展开
@@ -42,14 +44,22 @@ const gridOptions: VxeGridProps<RoleInfo> = {
       field: 'status',
       title: '状态',
       width: 80,
-      formatter: ({ cellValue }) => {
-        return cellValue === 1 ? '启用' : '禁用';
+      slots: {
+        default: (e) =>
+          h(Switch, {
+            checked: e.row.status === 1,
+            onClick: () => {
+              const newStatus = e.row.status === 1 ? 2 : 1;
+              updateRole({ id: e.row.id, status: newStatus }).then(() => {
+                e.row.status = newStatus;
+              });
+            },
+          }),
       },
     },
     { field: 'defaultRouter', title: '默认登录页面' },
     { field: 'remark', title: '备注' },
     { field: 'createdAt', title: '创建时间', formatter: 'formatDateTime' },
-    { field: 'updatedAt', title: '更新时间', formatter: 'formatDateTime' },
   ],
   toolbarConfig: {
     // 是否显示搜索表单控制按钮
@@ -69,6 +79,7 @@ const gridOptions: VxeGridProps<RoleInfo> = {
     ajax: {
       query: async ({ page }, formValues) => {
         const res = await getRoleList({
+          a: '',
           pageNo: page.currentPage,
           pageSize: page.pageSize,
           ...formValues,
@@ -84,6 +95,6 @@ const [Grid] = useVbenVxeGrid({ formOptions, gridOptions });
 
 <template>
   <Page autoContentHeight>
-    <Grid />
+    <Grid> </Grid>
   </Page>
 </template>
