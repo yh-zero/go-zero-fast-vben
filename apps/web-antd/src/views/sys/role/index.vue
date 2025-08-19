@@ -3,7 +3,7 @@ import type { VbenFormProps } from '#/adapter/form';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { RoleInfo } from '#/api/sys/model/roleModel';
 
-import { getRoleList, updateRole } from '#/api/sys/role';
+import { getRoleList, updateRole, deleteRole } from '#/api/sys/role';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Switch, Button, Popconfirm } from 'ant-design-vue';
@@ -115,6 +115,16 @@ function openFormModal(record: any, type: 'edit' | 'add') {
   });
   formModalApi.open();
 }
+
+async function handleDelete(ids: any[]) {
+  const result = await deleteRole({
+    ids,
+  });
+  console.log('handleDelete result', result);
+
+  await gridApi.reload();
+  // showDeleteButton.value = false;
+}
 </script>
 
 <template>
@@ -125,8 +135,10 @@ function openFormModal(record: any, type: 'edit' | 'add') {
         <Button type="link" @click="openFormModal(row, 'edit')">编辑</Button>
         <Button type="link">菜单权限</Button>
         <Button type="link">接口权限</Button>
-        <Popconfirm :title="`确定要删除 ${row.name} 吗？`">
-          <!--  @confirm="handleDelete(row)" -->
+        <Popconfirm
+          :title="`确定要删除 ${row.name} 吗？`"
+          @confirm="handleDelete([row.id])"
+        >
           <Button type="link">删除</Button>
         </Popconfirm>
       </template>
