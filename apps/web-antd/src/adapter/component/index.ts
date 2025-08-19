@@ -8,6 +8,8 @@ import type { Component } from 'vue';
 import type { BaseFormComponentType } from '@vben/common-ui';
 import type { Recordable } from '@vben/types';
 
+import { RadioButtonGroup } from '#/components/form';
+
 import { defineAsyncComponent, defineComponent, h, ref } from 'vue';
 
 import { ApiComponent, globalShareState, IconPicker } from '@vben/common-ui';
@@ -122,6 +124,7 @@ export type ComponentType =
   | 'TimePicker'
   | 'TreeSelect'
   | 'Upload'
+  | 'RadioButtonGroup'
   | BaseFormComponentType;
 
 async function initComponentAdapter() {
@@ -190,6 +193,8 @@ async function initComponentAdapter() {
     TimePicker,
     TreeSelect: withDefaultPlaceholder(TreeSelect, 'select'),
     Upload,
+    //  ----- 自定义 组件 ----
+    RadioButtonGroup, // 单选按钮组
   };
 
   // 将组件注册到全局共享状态中

@@ -45,6 +45,7 @@
     "ant-design-vue": "catalog:",
     "dayjs": "catalog:",
     "pinia": "catalog:",
+    "remeda": "^2.30.0",
     "vue": "catalog:",
     "vue-router": "catalog:"
   }

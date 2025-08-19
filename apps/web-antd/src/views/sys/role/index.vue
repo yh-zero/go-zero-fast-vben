@@ -5,9 +5,19 @@ import type { RoleInfo } from '#/api/sys/model/roleModel';
 
 import { getRoleList, updateRole } from '#/api/sys/role';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
-import { Page } from '@vben/common-ui';
-import { Switch } from 'ant-design-vue';
+import { Page, useVbenModal } from '@vben/common-ui';
+import { Switch, Button, Popconfirm } from 'ant-design-vue';
 import { h } from 'vue';
+
+import RoleForm from './modules/roleForm.vue';
+
+defineOptions({
+  name: 'RoleIndex',
+});
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: RoleForm,
+});
 
 const formOptions: VbenFormProps = {
   // 默认展开
@@ -60,6 +70,12 @@ const gridOptions: VxeGridProps<RoleInfo> = {
     { field: 'defaultRouter', title: '默认登录页面' },
     { field: 'remark', title: '备注' },
     { field: 'createdAt', title: '创建时间', formatter: 'formatDateTime' },
+    {
+      field: 'action',
+      title: '操作',
+      slots: { default: 'action' },
+      width: 320,
+    },
   ],
   toolbarConfig: {
     // 是否显示搜索表单控制按钮
@@ -79,7 +95,6 @@ const gridOptions: VxeGridProps<RoleInfo> = {
     ajax: {
       query: async ({ page }, formValues) => {
         const res = await getRoleList({
-          a: '',
           pageNo: page.currentPage,
           pageSize: page.pageSize,
           ...formValues,
@@ -90,11 +105,31 @@ const gridOptions: VxeGridProps<RoleInfo> = {
   },
 };
 
-const [Grid] = useVbenVxeGrid({ formOptions, gridOptions });
+const [Grid, gridApi] = useVbenVxeGrid({ formOptions, gridOptions });
+
+function openFormModal(record: any, type: 'edit' | 'add') {
+  formModalApi.setData({
+    record,
+    operationType: type,
+    gridApi,
+  });
+  formModalApi.open();
+}
 </script>
 
 <template>
   <Page autoContentHeight>
-    <Grid> </Grid>
+    <FormModal />
+    <Grid>
+      <template #action="{ row }">
+        <Button type="link" @click="openFormModal(row, 'edit')">编辑</Button>
+        <Button type="link">菜单权限</Button>
+        <Button type="link">接口权限</Button>
+        <Popconfirm :title="`确定要删除 ${row.name} 吗？`">
+          <!--  @confirm="handleDelete(row)" -->
+          <Button type="link">删除</Button>
+        </Popconfirm>
+      </template>
+    </Grid>
   </Page>
 </template>
