@@ -11,6 +11,7 @@ enum Api {
   GetRoleList = '/v1/sys/role/list',
   UpdateRole = '/v1/sys/role/updateRole',
   DeleteRole = '/v1/sys/role/deleteRole',
+  CreateRole = '/v1/sys/role/createRole',
 }
 
 // 获取角色列表
@@ -28,4 +29,8 @@ export const updateRole = (params: RoleInfo) => {
 // 删除角色 - 支持一个 多个
 export const deleteRole = (params: BaseIDsRequest) => {
   return requestClient.post<BaseResponse>(Api.DeleteRole, params);
+};
+
+export const createRole = (params: RoleInfo) => {
+  return requestClient.post<BaseResponse>(Api.CreateRole, params);
 };

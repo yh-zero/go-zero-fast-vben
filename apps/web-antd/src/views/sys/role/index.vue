@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import type { VbenFormProps } from '#/adapter/form';
-import type { VxeGridProps } from '#/adapter/vxe-table';
+import type { VxeGridProps, VxeGridListeners } from '#/adapter/vxe-table';
 import type { RoleInfo } from '#/api/sys/model/roleModel';
 
 import { getRoleList, updateRole, deleteRole } from '#/api/sys/role';
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { Page, useVbenModal } from '@vben/common-ui';
-import { Switch, Button, Popconfirm } from 'ant-design-vue';
-import { h } from 'vue';
+import { Switch, Button, Popconfirm, Modal, message } from 'ant-design-vue';
+import { h, ref } from 'vue';
 
 import RoleForm from './modules/roleForm.vue';
 
@@ -105,12 +105,15 @@ const gridOptions: VxeGridProps<RoleInfo> = {
   },
 };
 
-const [Grid, gridApi] = useVbenVxeGrid({ formOptions, gridOptions });
+const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions,
+  gridOptions,
+});
 
-function openFormModal(record: any, type: 'edit' | 'add') {
+function openFormModal(record: any) {
   formModalApi.setData({
     record,
-    operationType: type,
+    isUpdate: record?.id ? true : false,
     gridApi,
   });
   formModalApi.open();
@@ -125,6 +128,20 @@ async function handleDelete(ids: any[]) {
   await gridApi.reload();
   // showDeleteButton.value = false;
 }
+
+function handleBatchDelete() {
+  const ids = gridApi.grid.getCheckboxRecords().map((item: any) => item.id);
+  if (ids.length === 0) {
+    message.error('请选择要删除的角色');
+    return;
+  }
+  Modal.confirm({
+    title: '确认删除选中的角色吗？',
+    async onOk() {
+      handleDelete(ids);
+    },
+  });
+}
 </script>
 
 <template>
@@ -132,7 +149,7 @@ async function handleDelete(ids: any[]) {
     <FormModal />
     <Grid>
       <template #action="{ row }">
-        <Button type="link" @click="openFormModal(row, 'edit')">编辑</Button>
+        <Button type="link" @click="openFormModal(row)">编辑</Button>
         <Button type="link">菜单权限</Button>
         <Button type="link">接口权限</Button>
         <Popconfirm
@@ -141,6 +158,15 @@ async function handleDelete(ids: any[]) {
         >
           <Button type="link">删除</Button>
         </Popconfirm>
+      </template>
+
+      <template #toolbar-actions>
+        <Button danger type="primary" @click="handleBatchDelete">
+          批量删除
+        </Button>
+      </template>
+      <template #toolbar-tools>
+        <Button type="primary" @click="openFormModal"> 新增角色 </Button>
       </template>
     </Grid>
   </Page>

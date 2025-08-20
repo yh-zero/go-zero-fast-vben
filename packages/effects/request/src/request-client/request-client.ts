@@ -133,8 +133,6 @@ class RequestClient {
     config: RequestClientConfig,
   ): Promise<T> {
     try {
-      console.log('request url', url);
-      console.log('request config', config);
       const response: AxiosResponse<T> = await this.instance({
         url,
         ...config,

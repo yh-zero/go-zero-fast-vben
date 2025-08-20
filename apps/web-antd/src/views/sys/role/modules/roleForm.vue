@@ -2,9 +2,10 @@
 import type { RoleInfo } from '#/api/sys/model/roleModel';
 
 import { useVbenModal } from '@vben/common-ui';
-import { useVbenForm } from '#/adapter/form';
+import { useVbenForm, z } from '#/adapter/form';
+import { message } from 'ant-design-vue';
 
-import { updateRole } from '#/api/sys/role';
+import { updateRole, createRole } from '#/api/sys/role';
 
 import { ref } from 'vue';
 
@@ -17,8 +18,11 @@ const record = ref();
 const gridApi = ref();
 
 async function onSubmit(values: Record<string, any>) {
-  const res = await updateRole(values as RoleInfo);
+  const res = await (isUpdate.value
+    ? updateRole(values as RoleInfo)
+    : createRole(values as RoleInfo));
   console.log('onSubmit res', res);
+  // message.success(res.message); // 直接提示即可 封装的时候已经做了错误提示 请求接口错误了就不会到这里
   gridApi.value.reload();
 }
 
@@ -33,7 +37,7 @@ const [Model, modalApi] = useVbenModal({
   },
   onOpenChange(isOpen: boolean) {
     console.log('isOpen', isOpen);
-    isUpdate.value = modalApi.getData()?.operationType == 'edit' ? true : false;
+    isUpdate.value = modalApi.getData()?.isUpdate || false;
     record.value = modalApi.getData()?.record || {};
     gridApi.value = modalApi.getData()?.gridApi || {};
     modalApi.setState({
@@ -64,6 +68,7 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入 角色名称',
       },
+      rules: 'required',
     },
     {
       fieldName: 'defaultRouter',
@@ -72,6 +77,7 @@ const [Form, formApi] = useVbenForm({
       componentProps: {
         placeholder: '请输入 默认登录页面',
       },
+      rules: z.string().default('默认值').optional(),
     },
     {
       fieldName: 'remark',
@@ -91,6 +97,7 @@ const [Form, formApi] = useVbenForm({
           { label: '禁用', value: 2 },
         ],
       },
+      rules: z.number().default(1).optional(),
     },
   ],
   showDefaultActions: false,
