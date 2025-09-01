@@ -11,7 +11,7 @@ import { message } from 'ant-design-vue';
 // import { getAllMenusApi } from '#/api';
 import { getMenuListByRole } from '#/api/sys/menu';
 import type { RouteItem } from '#/api/sys/model/menuModel';
-import { array2tree } from '@axolo/tree-array';
+import { arrayToTree } from 'performant-array-to-tree';
 import { BasicLayout, IFrameView } from '#/layouts';
 import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
@@ -38,7 +38,7 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
       // const menuData = await getAllMenusApi();
       const menuData = await getMenuListByRole();
       const authStore = useAuthStore();
-      console.log('generateAccess menus data', menuData.data);
+      console.log('generateAccess menus list', menuData.list);
 
       authStore.authLogin;
       authStore.elementPermissionList = [];
@@ -47,7 +47,7 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
       //   console.log('generateAccess index', index);
       //   console.log('generateAccess arr', arr);
       // });
-      menuData.data.forEach((val, _idx, _arr) => {
+      menuData.list.forEach((val, _idx, _arr) => {
         if (val.component === 'LAYOUT') {
           val.component = '';
         } else if (
@@ -77,15 +77,38 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
         }
       });
 
-      const treeData: RouteItem[] = array2tree(
-        menuData.data.filter((val) => val.path !== ''),
+      console.log('generateAccess menuData', menuData);
+      console.log('generateAccess menuData list', menuData.list);
+
+      // const treeData: RouteItem[] = arrayToTree(
+      //   menuData.list.filter((val) => val.path !== ''),
+      //   {
+      //     dataField: null, // 不使用额外的数据字段
+      //   },
+      // ) as RouteItem[];
+
+      const treeData = arrayToTree(
+        menuData.list
+          .filter((item) => item.path)
+          .map((item) => ({ ...item, parentId: item.parentId || null })),
+        { dataField: null },
       ) as RouteItem[];
+      // const listWithNullRoot = menuData.list.map((item) => ({
+      //   ...item,
+      //   parentId: item.parentId === 0 ? null : item.parentId,
+      // }));
+      // const treeData: RouteItem[] = arrayToTree(
+      //   listWithNullRoot.filter((val) => val.path !== ''),
+      //   { dataField: null },
+      // ) as RouteItem[];
+      console.log('generateAccess treeData111', treeData);
+
       treeData.forEach((val, idx, arr) => {
         if (val.component === '' && arr[idx]) {
           arr[idx].component = 'BasicLayout';
         }
       });
-      console.log('generateAccess treeData', treeData);
+      console.log('generateAccess treeData222', treeData);
 
       return treeData;
     },

@@ -18,6 +18,10 @@ export interface BaseIDsRequest {
   ids: number[];
 }
 
+export interface BaseResultResponse<T> {
+  list: T[];
+}
+
 // export interface BaseDataResp<T> {
 //   data: T[];
 // }

@@ -330,6 +330,9 @@ catalogs:
     ora:
       specifier: ^8.2.0
       version: 8.2.0
+    performant-array-to-tree:
+      specifier: ^1.11.0
+      version: 1.11.0
     pinia-plugin-persistedstate:
       specifier: ^4.4.1
       version: 4.4.1
@@ -375,6 +378,9 @@ catalogs:
     radix-vue:
       specifier: ^1.9.17
       version: 1.9.17
+    remeda:
+      specifier: ^2.30.0
+      version: 2.30.0
     resolve.exports:
       specifier: ^2.0.3
       version: 2.0.3
@@ -644,9 +650,6 @@ importers:
 
   apps/web-antd:
     dependencies:
-      '@axolo/tree-array':
-        specifier: ^0.6.0
-        version: 0.6.0
       '@vben/access':
         specifier: workspace:*
         version: link:../../packages/effects/access
@@ -698,11 +701,14 @@ importers:
       dayjs:
         specifier: 'catalog:'
         version: 1.11.13
+      performant-array-to-tree:
+        specifier: 'catalog:'
+        version: 1.11.0
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
       remeda:
-        specifier: ^2.30.0
+        specifier: 'catalog:'
         version: 2.30.0
       vue:
         specifier: ^3.5.17
@@ -1972,9 +1978,6 @@ packages:
   '@ast-grep/napi@0.37.0':
     resolution: {integrity: sha512-Hb4o6h1Pf6yRUAX07DR4JVY7dmQw+RVQMW5/m55GoiAT/VRoKCWBtIUPPOnqDVhbx1Cjfil9b6EDrgJsUAujEQ==}
     engines: {node: '>= 10'}
-
-  '@axolo/tree-array@0.6.0':
-    resolution: {integrity: sha512-jsT7AOpWud1Jr1Jfem+pMvopWJ9HlJCyiIw1ToMA1YkN3fEb+izAG+jNTGPfMyA/XTLzY2JPQ6TF61QAJXPLXw==}
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -8849,6 +8852,9 @@ packages:
   perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
 
+  performant-array-to-tree@1.11.0:
+    resolution: {integrity: sha512-YwCqIDvnaebXaKuKQhI5yJD6ryDc3FxvoeX/5ougXTKDUWb7s5S2BuBgIyftCa4sBe1+ZU5Kmi4RJy+pjjjrpw==}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -10030,6 +10036,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   sourcemap-codec@1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
@@ -11566,8 +11573,6 @@ snapshots:
       '@ast-grep/napi-win32-arm64-msvc': 0.37.0
       '@ast-grep/napi-win32-ia32-msvc': 0.37.0
       '@ast-grep/napi-win32-x64-msvc': 0.37.0
-
-  '@axolo/tree-array@0.6.0': {}
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -15622,7 +15627,7 @@ snapshots:
       chalk: 5.4.1
       cli-boxes: 3.0.0
       string-width: 7.2.0
-      type-fest: 4.40.1
+      type-fest: 4.41.0
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
 
@@ -16617,7 +16622,7 @@ snapshots:
 
   dot-prop@9.0.0:
     dependencies:
-      type-fest: 4.40.1
+      type-fest: 4.41.0
 
   dotenv-expand@8.0.3: {}
 
@@ -19213,7 +19218,7 @@ snapshots:
     dependencies:
       '@babel/code-frame': 7.27.1
       index-to-position: 1.1.0
-      type-fest: 4.40.1
+      type-fest: 4.41.0
 
   parse-ms@4.0.0: {}
 
@@ -19282,6 +19287,8 @@ snapshots:
   pend@1.2.0: {}
 
   perfect-debounce@1.0.0: {}
+
+  performant-array-to-tree@1.11.0: {}
 
   picocolors@1.1.1: {}
 
@@ -19973,14 +19980,14 @@ snapshots:
     dependencies:
       find-up-simple: 1.0.1
       read-pkg: 9.0.1
-      type-fest: 4.40.1
+      type-fest: 4.41.0
 
   read-pkg@9.0.1:
     dependencies:
       '@types/normalize-package-data': 2.4.4
       normalize-package-data: 6.0.2
       parse-json: 8.3.0
-      type-fest: 4.40.1
+      type-fest: 4.41.0
       unicorn-magic: 0.1.0
 
   read-yaml-file@1.1.0:

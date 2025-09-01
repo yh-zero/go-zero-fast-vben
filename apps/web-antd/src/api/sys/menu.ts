@@ -1,4 +1,4 @@
-import { type BaseDataResp } from '#/api/model/baseModel';
+import { type BaseResultResponse } from '#/api/model/baseModel';
 import { requestClient } from '#/api/request';
 
 import { type RoleMenuResp } from './model/menuModel';
@@ -13,7 +13,7 @@ enum Api {
  */
 export const getMenuListByRole = () => {
   // return requestClient.get<BaseDataResp<RoleMenuResp>>(Api.GetMenuListByRole);
-  return requestClient.get<BaseDataResp<RouteRecordStringComponent>>(
+  return requestClient.get<BaseResultResponse<RouteRecordStringComponent>>(
     Api.GetMenuListByRole,
   );
 };
