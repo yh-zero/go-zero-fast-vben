@@ -1,0 +1,173 @@
+<script lang="ts" setup>
+import type { VbenFormProps } from '#/adapter/form';
+import type { VxeGridProps, VxeGridListeners } from '#/adapter/vxe-table';
+import type { RoleInfo } from '#/api/sys/model/roleModel';
+
+import { getRoleList, updateRole, deleteRole } from '#/api/sys/role';
+import { getMenuList } from '#/api/sys/menu';
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { Page, useVbenModal } from '@vben/common-ui';
+import { Switch, Button, Popconfirm, Modal, message } from 'ant-design-vue';
+import { h, ref } from 'vue';
+
+import RoleForm from './modules/roleForm.vue';
+
+defineOptions({
+  name: 'RoleIndex',
+});
+
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: RoleForm,
+});
+
+const formOptions: VbenFormProps = {
+  // 默认展开
+  collapsed: false,
+  schema: [
+    {
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入 角色名称',
+      },
+      fieldName: 'name',
+      label: '角色名称',
+    },
+  ],
+  // 控制表单是否显示折叠按钮
+  showCollapseButton: false,
+  submitButtonOptions: {
+    content: '查询',
+  },
+  // 是否在字段值改变时提交表单
+  submitOnChange: false,
+  // 按下回车时是否提交表单
+  submitOnEnter: true,
+};
+
+const gridOptions: VxeGridProps<RoleInfo> = {
+  checkboxConfig: {
+    highlight: true,
+  },
+  columns: [
+    { type: 'checkbox', width: 60 },
+    { field: 'name', title: '菜单名称' },
+    { field: 'icon', title: '图标' },
+    { field: 'serviceName', title: '所属服务' },
+    { field: 'path', title: '路由地址' },
+    { field: 'sort', title: '排序' },
+    {
+      field: 'status',
+      title: '状态',
+      width: 80,
+      slots: {
+        default: (e) =>
+          h(Switch, {
+            checked: e.row.status === 1,
+            onClick: () => {
+              const newStatus = e.row.status === 1 ? 2 : 1;
+              updateRole({ id: e.row.id, status: newStatus }).then(() => {
+                e.row.status = newStatus;
+              });
+            },
+          }),
+      },
+    },
+    { field: 'hideMenu', title: '隐藏' },
+    { field: 'createdAt', title: '创建时间', formatter: 'formatDateTime' },
+    {
+      field: 'action',
+      title: '操作',
+      slots: { default: 'action' },
+      width: 320,
+    },
+  ],
+  toolbarConfig: {
+    // 是否显示搜索表单控制按钮
+    // @ts-ignore 正式环境时有完整的类型声明
+    search: true,
+  },
+  height: 'auto',
+  keepSource: true,
+  pagerConfig: {
+    currentPage: 1, // 默认当前页码
+    pageSize: 10, // 默认每页条数
+    pageSizes: [2, 10, 20, 50, 100], // 可选择的每页条数
+    // layout: 'Total, sizes, prev, pager, next, jumper', // 分页器布局
+    total: 0, // 总条数（通常由数据加载后设置）
+  },
+  proxyConfig: {
+    ajax: {
+      query: async ({ page }, formValues) => {
+        const res = await getMenuList();
+        return res;
+      },
+    },
+  },
+};
+
+const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions,
+  gridOptions,
+});
+
+function openFormModal(record: any) {
+  formModalApi.setData({
+    record,
+    isUpdate: record?.id ? true : false,
+    gridApi,
+  });
+  formModalApi.open();
+}
+
+async function handleDelete(ids: any[]) {
+  const result = await deleteRole({
+    ids,
+  });
+  console.log('handleDelete result', result);
+
+  await gridApi.reload();
+  // showDeleteButton.value = false;
+}
+
+function handleBatchDelete() {
+  const ids = gridApi.grid.getCheckboxRecords().map((item: any) => item.id);
+  if (ids.length === 0) {
+    message.error('请选择要删除的角色');
+    return;
+  }
+  Modal.confirm({
+    title: '确认删除选中的角色吗？',
+    async onOk() {
+      handleDelete(ids);
+    },
+  });
+}
+</script>
+
+<template>
+  <Page autoContentHeight>
+    <FormModal />
+    <Grid>
+      <template #action="{ row }">
+        <Button type="link" @click="openFormModal(row)">编辑</Button>
+        <Button type="link">菜单权限</Button>
+        <Button type="link">接口权限</Button>
+        <Popconfirm
+          :title="`确定要删除 ${row.name} 吗？`"
+          @confirm="handleDelete([row.id])"
+        >
+          <Button type="link">删除</Button>
+        </Popconfirm>
+      </template>
+
+      <template #toolbar-actions>
+        <Button danger type="primary" @click="handleBatchDelete">
+          批量删除
+        </Button>
+      </template>
+      <template #toolbar-tools>
+        <Button type="primary" @click="openFormModal"> 新增角色 </Button>
+      </template>
+    </Grid>
+  </Page>
+</template>
